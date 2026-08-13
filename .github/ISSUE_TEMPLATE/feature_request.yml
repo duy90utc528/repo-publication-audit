@@ -1,0 +1,15 @@
+name: Feature request
+description: Propose a small, broadly useful publication-preflight check.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true

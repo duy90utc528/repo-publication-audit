@@ -8,13 +8,17 @@ from pathlib import Path
 
 from .audit import audit
 
+VERSION = "0.1.0"
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Audit a repository before making it public.")
     parser.add_argument("path", type=Path, nargs="?", default=Path("."))
     parser.add_argument("--format", choices=("text", "json"), default="text")
+    parser.add_argument("--exclude", action="append", default=[], metavar="PATH", help="skip a relative path or directory")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     arguments = parser.parse_args()
-    findings = audit(arguments.path)
+    findings = audit(arguments.path, tuple(arguments.exclude))
     if arguments.format == "json":
         print(json.dumps([finding.as_dict() for finding in findings], indent=2))
     else:

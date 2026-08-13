@@ -33,3 +33,14 @@ class AuditTests(unittest.TestCase):
             (root / ".git" / "config").write_text(token, encoding="utf-8")
             findings = audit(root)
         self.assertFalse(any(finding.severity == "high" for finding in findings))
+
+    def test_excludes_relative_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.create_community_files(root)
+            private = root / "examples"
+            private.mkdir()
+            token = "ghp_" + "abcdefghijklmnopqrstuvwx"
+            (private / "sanitized-fixture.txt").write_text(token, encoding="utf-8")
+            findings = audit(root, excludes=("examples",))
+        self.assertFalse(any(finding.severity == "high" for finding in findings))

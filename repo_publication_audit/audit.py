@@ -26,7 +26,7 @@ class Finding:
         return asdict(self)
 
 
-def audit(root: Path) -> list[Finding]:
+def audit(root: Path, excludes: tuple[str, ...] = ()) -> list[Finding]:
     """Return publication findings for *root* without network access."""
     root = root.resolve()
     if not root.is_dir():
@@ -38,6 +38,8 @@ def audit(root: Path) -> list[Finding]:
         if not item.is_file():
             continue
         relative = item.relative_to(root).as_posix()
+        if _is_excluded(relative, excludes):
+            continue
         if item.name in SENSITIVE_NAMES or item.suffix in {".pem", ".p12", ".key"}:
             findings.append(Finding("high", relative, "sensitive credential-like file name"))
         if item.stat().st_size > 1_048_576 or item.suffix.lower() in {".png", ".jpg", ".zip", ".pdf"}:
@@ -50,6 +52,10 @@ def audit(root: Path) -> list[Finding]:
             if pattern.search(content):
                 findings.append(Finding("high", relative, f"possible {label}"))
     return findings
+
+
+def _is_excluded(relative: str, excludes: tuple[str, ...]) -> bool:
+    return any(relative == excluded or relative.startswith(f"{excluded.rstrip('/')}/") for excluded in excludes)
 
 
 def _community_findings(root: Path) -> list[Finding]:

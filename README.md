@@ -15,10 +15,23 @@ cd repo-publication-audit
 python -m repo_publication_audit /path/to/repository
 ```
 
+After installation, the equivalent command is:
+
+```bash
+repo-publication-audit /path/to/repository
+```
+
 For automation, emit machine-readable results:
 
 ```bash
 python -m repo_publication_audit . --format json
+```
+
+Exclude intentionally committed test data or an exported directory with a
+repeatable relative path:
+
+```bash
+repo-publication-audit . --exclude examples --exclude fixtures
 ```
 
 The process exits with status `1` when it finds a high-severity finding.
@@ -37,6 +50,8 @@ This project supports Python 3.11+ and uses only the standard library.
 
 ```bash
 python -m unittest discover -s tests -v
+python -m pip install .
+repo-publication-audit --version
 ```
 
 ## Limitations
@@ -49,6 +64,12 @@ environments, dependency directories, and files larger than 1 MiB.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md). Security reports belong in the private
 channel described in [SECURITY.md](SECURITY.md).
+
+## Roadmap
+
+- v0.1: stable local CLI and JSON output.
+- Next: optional `.gitignore` awareness and configurable rules.
+- Later: a reusable GitHub Action once the CLI semantics are stable.
 
 ## License
 

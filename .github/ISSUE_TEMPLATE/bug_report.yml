@@ -1,0 +1,19 @@
+name: Bug report
+description: Report incorrect audit behavior without posting secrets.
+body:
+  - type: markdown
+    attributes:
+      value: Never paste live credentials, private keys, or full sensitive files.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Show sanitized file names and content only.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual results
+    validations:
+      required: true
