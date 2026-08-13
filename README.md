@@ -34,6 +34,49 @@ repeatable relative path:
 repo-publication-audit . --exclude examples --exclude fixtures
 ```
 
+Respect simple rules in the repository's root `.gitignore`:
+
+```bash
+repo-publication-audit . --respect-gitignore
+```
+
+## CI with GitHub Actions
+
+Create `.github/workflows/publication-audit.yml` in the repository you want to
+check:
+
+```yaml
+name: publication audit
+on: [pull_request, push]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: duy90utc528/repo-publication-audit@v0.2.0
+        with:
+          fail-on: high
+          respect-gitignore: true
+```
+
+Pin to a commit SHA in security-sensitive environments. The action installs the
+package locally in the GitHub runner; it does not upload repository content.
+
+## Configuration
+
+Copy [`.repo-publication-audit.toml.example`](.repo-publication-audit.toml.example)
+to `.repo-publication-audit.toml` in a repository being audited:
+
+```toml
+[audit]
+exclude = ["fixtures"]
+fail_on = "high"
+respect_gitignore = true
+```
+
+`fail_on = "medium"` also makes absent community files fail CI; `"never"`
+reports findings without returning a nonzero exit status.
+
 The process exits with status `1` when it finds a high-severity finding.
 
 ## Checks
@@ -67,9 +110,8 @@ channel described in [SECURITY.md](SECURITY.md).
 
 ## Roadmap
 
-- v0.1: stable local CLI and JSON output.
-- Next: optional `.gitignore` awareness and configurable rules.
-- Later: a reusable GitHub Action once the CLI semantics are stable.
+- v0.2: GitHub Action, TOML defaults, and simple `.gitignore` support.
+- Next: richer gitignore compatibility and opt-in repository policy packs.
 
 ## License
 

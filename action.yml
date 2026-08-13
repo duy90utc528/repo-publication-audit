@@ -1,0 +1,32 @@
+name: Repo Publication Audit
+description: Check a repository for publication-preflight findings.
+branding:
+  icon: shield
+  color: blue
+inputs:
+  path:
+    description: Repository path to audit.
+    required: false
+    default: .
+  fail-on:
+    description: Lowest severity that fails the workflow: high, medium, or never.
+    required: false
+    default: high
+  respect-gitignore:
+    description: Skip paths covered by the root .gitignore.
+    required: false
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - shell: bash
+      env:
+        RESPECT_GITIGNORE: ${{ inputs.respect-gitignore }}
+      run: |
+        python -m pip install "$GITHUB_ACTION_PATH"
+        flags=()
+        if [ "$RESPECT_GITIGNORE" = "true" ]; then flags+=(--respect-gitignore); fi
+        repo-publication-audit "${{ inputs.path }}" --format json --fail-on "${{ inputs.fail-on }}" "${flags[@]}"

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import fnmatch
 from pathlib import Path
 import re
 
@@ -26,11 +27,12 @@ class Finding:
         return asdict(self)
 
 
-def audit(root: Path, excludes: tuple[str, ...] = ()) -> list[Finding]:
+def audit(root: Path, excludes: tuple[str, ...] = (), respect_gitignore: bool = False) -> list[Finding]:
     """Return publication findings for *root* without network access."""
     root = root.resolve()
     if not root.is_dir():
         raise ValueError(f"not a directory: {root}")
+    ignored = _gitignore_patterns(root) if respect_gitignore else ()
     findings = _community_findings(root)
     for item in root.rglob("*"):
         if any(part in SKIP_DIRECTORIES for part in item.relative_to(root).parts):
@@ -38,7 +40,7 @@ def audit(root: Path, excludes: tuple[str, ...] = ()) -> list[Finding]:
         if not item.is_file():
             continue
         relative = item.relative_to(root).as_posix()
-        if _is_excluded(relative, excludes):
+        if _is_excluded(relative, excludes) or _is_ignored(relative, ignored):
             continue
         if item.name in SENSITIVE_NAMES or item.suffix in {".pem", ".p12", ".key"}:
             findings.append(Finding("high", relative, "sensitive credential-like file name"))
@@ -56,6 +58,25 @@ def audit(root: Path, excludes: tuple[str, ...] = ()) -> list[Finding]:
 
 def _is_excluded(relative: str, excludes: tuple[str, ...]) -> bool:
     return any(relative == excluded or relative.startswith(f"{excluded.rstrip('/')}/") for excluded in excludes)
+
+
+def _gitignore_patterns(root: Path) -> tuple[str, ...]:
+    gitignore = root / ".gitignore"
+    if not gitignore.is_file():
+        return ()
+    return tuple(
+        line.strip().lstrip("/")
+        for line in gitignore.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#") and not line.lstrip().startswith("!")
+    )
+
+
+def _is_ignored(relative: str, patterns: tuple[str, ...]) -> bool:
+    return any(
+        fnmatch.fnmatch(relative, pattern.rstrip("/"))
+        or relative.startswith(f"{pattern.rstrip('/')}/")
+        for pattern in patterns
+    )
 
 
 def _community_findings(root: Path) -> list[Finding]:

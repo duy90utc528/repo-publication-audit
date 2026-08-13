@@ -1,0 +1,6 @@
+[audit]
+# Directories that intentionally contain credential-shaped fixture data.
+exclude = ["fixtures"]
+# "high" is suitable for CI; use "medium" to require community documents too.
+fail_on = "high"
+respect_gitignore = true
