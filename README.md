@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: duy90utc528/repo-publication-audit@v0.2.0
+      - uses: duy90utc528/repo-publication-audit@v0.3.0
         with:
           fail-on: high
           respect-gitignore: true
@@ -61,6 +61,30 @@ jobs:
 
 Pin to a commit SHA in security-sensitive environments. The action installs the
 package locally in the GitHub runner; it does not upload repository content.
+
+### GitHub Code Scanning (SARIF)
+
+SARIF is GitHub's standard format for surfacing third-party security findings in
+Code Scanning. Generate a report, keep the audit non-blocking while it collects
+findings, then upload it:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: duy90utc528/repo-publication-audit@v0.3.0
+    with:
+      format: sarif
+      output: repo-publication-audit.sarif
+      fail-on: never
+  - uses: github/codeql-action/upload-sarif@v4
+    with:
+      sarif_file: repo-publication-audit.sarif
+      category: repo-publication-audit
+```
 
 ## Configuration
 
@@ -110,7 +134,7 @@ channel described in [SECURITY.md](SECURITY.md).
 
 ## Roadmap
 
-- v0.2: GitHub Action, TOML defaults, and simple `.gitignore` support.
+- v0.3: SARIF output for GitHub Code Scanning and stable rule IDs.
 - Next: richer gitignore compatibility and opt-in repository policy packs.
 
 ## License

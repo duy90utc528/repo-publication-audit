@@ -22,6 +22,8 @@ class Finding:
     severity: str
     path: str
     message: str
+    rule_id: str
+    line: int | None = None
 
     def as_dict(self) -> dict[str, str]:
         return asdict(self)
@@ -43,7 +45,7 @@ def audit(root: Path, excludes: tuple[str, ...] = (), respect_gitignore: bool = 
         if _is_excluded(relative, excludes) or _is_ignored(relative, ignored):
             continue
         if item.name in SENSITIVE_NAMES or item.suffix in {".pem", ".p12", ".key"}:
-            findings.append(Finding("high", relative, "sensitive credential-like file name"))
+            findings.append(Finding("high", relative, "sensitive credential-like file name", "RPA001"))
         if item.stat().st_size > 1_048_576 or item.suffix.lower() in {".png", ".jpg", ".zip", ".pdf"}:
             continue
         try:
@@ -52,7 +54,7 @@ def audit(root: Path, excludes: tuple[str, ...] = (), respect_gitignore: bool = 
             continue
         for label, pattern in TOKEN_PATTERNS.items():
             if pattern.search(content):
-                findings.append(Finding("high", relative, f"possible {label}"))
+                findings.append(Finding("high", relative, f"possible {label}", "RPA002", _match_line(content, pattern)))
     return findings
 
 
@@ -79,11 +81,15 @@ def _is_ignored(relative: str, patterns: tuple[str, ...]) -> bool:
     )
 
 
+def _match_line(content: str, pattern: re.Pattern[str]) -> int:
+    return content[: pattern.search(content).start()].count("\n") + 1
+
+
 def _community_findings(root: Path) -> list[Finding]:
     names = {item.name.upper() for item in root.iterdir()}
     findings: list[Finding] = []
     for label, filename in COMMUNITY_FILES.items():
         expected = filename.upper()
         if not any(name == expected or name.startswith(f"{expected}.") for name in names):
-            findings.append(Finding("medium", filename, f"missing {label} community file"))
+            findings.append(Finding("medium", filename, f"missing {label} community file", "RPA101"))
     return findings

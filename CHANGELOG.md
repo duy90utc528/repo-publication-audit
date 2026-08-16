@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## 0.3.0 — 2026-08-16
+
+- Added SARIF 2.1.0 reports with stable rule IDs for GitHub Code Scanning.
+- Added report-file output and SARIF support to the GitHub Action.
+
 ## 0.2.0 — 2026-08-13
 
 - Added a reusable GitHub Action for pull-request and release checks.

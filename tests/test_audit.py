@@ -4,6 +4,7 @@ from pathlib import Path
 
 from repo_publication_audit.audit import audit
 from repo_publication_audit.__main__ import _settings
+from repo_publication_audit.reporting import sarif_report
 
 
 class AuditTests(unittest.TestCase):
@@ -69,3 +70,15 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(settings["exclude"], ["fixtures"])
         self.assertEqual(settings["fail_on"], "medium")
         self.assertTrue(settings["respect_gitignore"])
+
+    def test_sarif_report_has_rule_and_location(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.create_community_files(root)
+            token = "ghp_" + "abcdefghijklmnopqrstuvwx"
+            (root / "config.py").write_text(f"token = '{token}'", encoding="utf-8")
+            report = sarif_report(audit(root))
+        result = report["runs"][0]["results"][0]
+        self.assertEqual(report["version"], "2.1.0")
+        self.assertEqual(result["ruleId"], "RPA002")
+        self.assertEqual(result["locations"][0]["physicalLocation"]["region"]["startLine"], 1)

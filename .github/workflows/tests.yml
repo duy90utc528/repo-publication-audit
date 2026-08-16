@@ -22,3 +22,13 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python -m pip install .
       - run: repo-publication-audit . --format json
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          format: sarif
+          output: repo-publication-audit.sarif
+          fail-on: never
+      - run: test -s repo-publication-audit.sarif

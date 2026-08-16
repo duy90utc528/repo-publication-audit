@@ -8,15 +8,17 @@ from pathlib import Path
 import tomllib
 
 from .audit import audit
+from .reporting import sarif_report
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 SEVERITY_ORDER = {"never": 3, "high": 2, "medium": 1}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Audit a repository before making it public.")
     parser.add_argument("path", type=Path, nargs="?", default=Path("."))
-    parser.add_argument("--format", choices=("text", "json"), default="text")
+    parser.add_argument("--format", choices=("text", "json", "sarif"), default="text")
+    parser.add_argument("--output", type=Path, help="write the report to this file instead of stdout")
     parser.add_argument("--exclude", action="append", default=[], metavar="PATH", help="skip a relative path or directory")
     parser.add_argument("--respect-gitignore", action="store_true", help="skip paths matched by the root .gitignore")
     parser.add_argument("--fail-on", choices=("high", "medium", "never"), default=None, help="lowest severity that returns exit code 1")
@@ -29,11 +31,15 @@ def main() -> int:
     fail_on = arguments.fail_on or settings.get("fail_on", "high")
     findings = audit(arguments.path, excludes, respect_gitignore)
     if arguments.format == "json":
-        print(json.dumps([finding.as_dict() for finding in findings], indent=2))
+        report = json.dumps([finding.as_dict() for finding in findings], indent=2)
+    elif arguments.format == "sarif":
+        report = json.dumps(sarif_report(findings), indent=2)
     else:
-        for finding in findings:
-            print(f"{finding.severity.upper():7} {finding.path}: {finding.message}")
-        print(f"{len(findings)} finding(s)")
+        report = "\n".join([*(f"{finding.severity.upper():7} {finding.path}: {finding.message}" for finding in findings), f"{len(findings)} finding(s)"])
+    if arguments.output:
+        arguments.output.write_text(report + "\n", encoding="utf-8")
+    else:
+        print(report)
     return 1 if any(SEVERITY_ORDER[finding.severity] >= SEVERITY_ORDER[fail_on] for finding in findings) else 0
 
 
