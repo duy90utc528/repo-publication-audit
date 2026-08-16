@@ -31,7 +31,7 @@ def sarif_report(findings: list[Finding]) -> dict[str, object]:
         "runs": [{
             "tool": {"driver": {
                 "name": "Repo Publication Audit",
-                "version": "0.3.1",
+                "version": "0.4.0",
                 "rules": [
                     {"id": rule_id, "shortDescription": {"text": rules[rule_id][0]}, "fullDescription": {"text": rules[rule_id][1]}}
                     for rule_id in sorted(used_rules)

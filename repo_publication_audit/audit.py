@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 import fnmatch
 from pathlib import Path
 import re
+import subprocess
 
 SKIP_DIRECTORIES = {".git", ".venv", "venv", "node_modules", "__pycache__"}
 SENSITIVE_NAMES = {".env", "id_rsa", "credentials.json", "service-account.json"}
@@ -42,7 +43,7 @@ def audit(root: Path, excludes: tuple[str, ...] = (), respect_gitignore: bool = 
         if not item.is_file():
             continue
         relative = item.relative_to(root).as_posix()
-        if _is_excluded(relative, excludes) or _is_ignored(relative, ignored):
+        if _is_excluded(relative, excludes) or _is_git_ignored(root, relative, ignored):
             continue
         if item.name in SENSITIVE_NAMES or item.suffix in {".pem", ".p12", ".key"}:
             findings.append(Finding("high", relative, "sensitive credential-like file name", "RPA001"))
@@ -79,6 +80,24 @@ def _is_ignored(relative: str, patterns: tuple[str, ...]) -> bool:
         or relative.startswith(f"{pattern.rstrip('/')}/")
         for pattern in patterns
     )
+
+
+def _is_git_ignored(root: Path, relative: str, fallback_patterns: tuple[str, ...]) -> bool:
+    """Use Git's matcher when possible, retaining a small no-Git fallback."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "check-ignore", "--no-index", "-q", "--", relative],
+            capture_output=True,
+            check=False,
+            timeout=5,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return _is_ignored(relative, fallback_patterns)
+    if result.returncode == 0:
+        return True
+    if result.returncode == 1:
+        return False
+    return _is_ignored(relative, fallback_patterns)
 
 
 def _match_line(content: str, pattern: re.Pattern[str]) -> int:

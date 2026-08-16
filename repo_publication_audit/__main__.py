@@ -10,7 +10,7 @@ import tomllib
 from .audit import audit
 from .reporting import sarif_report
 
-VERSION = "0.3.1"
+VERSION = "0.4.0"
 SEVERITY_ORDER = {"never": 3, "high": 2, "medium": 1}
 
 

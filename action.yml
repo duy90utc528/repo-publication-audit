@@ -13,7 +13,7 @@ inputs:
     required: false
     default: high
   respect-gitignore:
-    description: Skip paths covered by the root .gitignore.
+    description: Skip paths covered by Git's .gitignore rules.
     required: false
     default: 'true'
   format:

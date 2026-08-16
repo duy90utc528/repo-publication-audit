@@ -34,7 +34,8 @@ repeatable relative path:
 repo-publication-audit . --exclude examples --exclude fixtures
 ```
 
-Respect simple rules in the repository's root `.gitignore`:
+Respect Git's `.gitignore` rules, including nested files and negation rules,
+when Git is installed:
 
 ```bash
 repo-publication-audit . --respect-gitignore
@@ -53,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: duy90utc528/repo-publication-audit@v0.3.1
+      - uses: duy90utc528/repo-publication-audit@v0.4.0
         with:
           fail-on: high
           respect-gitignore: true
@@ -75,7 +76,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: duy90utc528/repo-publication-audit@v0.3.1
+  - uses: duy90utc528/repo-publication-audit@v0.4.0
     with:
       format: sarif
       output: repo-publication-audit.sarif
@@ -142,7 +143,8 @@ This feedback determines the v0.4 roadmap.
 ## Roadmap
 
 - v0.3: SARIF output for GitHub Code Scanning and stable rule IDs.
-- Next: richer gitignore compatibility and opt-in repository policy packs.
+- v0.4: full Git `.gitignore` semantics for opt-in scans.
+- Next: opt-in repository policy packs and reviewed-finding baselines.
 
 ## License
 

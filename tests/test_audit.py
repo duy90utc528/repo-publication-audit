@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+import subprocess
 
 from repo_publication_audit.audit import audit
 from repo_publication_audit.__main__ import _settings
@@ -58,6 +59,21 @@ class AuditTests(unittest.TestCase):
             (local / "example.txt").write_text(token, encoding="utf-8")
             findings = audit(root, respect_gitignore=True)
         self.assertFalse(any(finding.severity == "high" for finding in findings))
+
+    def test_respects_nested_gitignore_and_negation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.create_community_files(root)
+            subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+            nested = root / "generated"
+            nested.mkdir()
+            (nested / ".gitignore").write_text("*.env\n!important.env\n", encoding="utf-8")
+            token = "ghp_" + "abcdefghijklmnopqrstuvwx"
+            (nested / "secret.env").write_text(token, encoding="utf-8")
+            (nested / "important.env").write_text(token, encoding="utf-8")
+            findings = audit(root, respect_gitignore=True)
+        paths = {finding.path for finding in findings if finding.rule_id == "RPA002"}
+        self.assertEqual(paths, {"generated/important.env"})
 
     def test_reads_toml_defaults(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

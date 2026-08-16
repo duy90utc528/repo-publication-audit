@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## 0.4.0 — 2026-08-16
+
+- Use Git's native matcher for opt-in `.gitignore` support, including nested
+  ignore files and negation rules.
+- Retain the small root-file fallback when Git is unavailable.
+
 ## 0.3.1 — 2026-08-16
 
 - Fixed composite-action YAML parsing for CI inputs.
