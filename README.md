@@ -1,5 +1,7 @@
 # Repo Publication Audit
 
+![A shield and magnifying glass protecting a source repository](assets/social-preview.png)
+
 A small, dependency-free preflight checker for repositories about to become
 public. It catches common accidental disclosures and reports whether a project
 has the basic community files expected of an open-source repository.
