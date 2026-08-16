@@ -9,6 +9,8 @@ has the basic community files expected of an open-source repository.
 It is intentionally conservative: findings are prompts for review, not proof
 that a secret is valid or that a repository is safe to publish.
 
+Available on the [GitHub Marketplace](https://github.com/marketplace/actions/repo-publication-audit).
+
 ## Quick start
 
 ```bash
@@ -56,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: duy90utc528/repo-publication-audit@v0.4.0
+      - uses: duy90utc528/repo-publication-audit@V0.4.1
         with:
           fail-on: high
           respect-gitignore: true
@@ -78,7 +80,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: duy90utc528/repo-publication-audit@v0.4.0
+  - uses: duy90utc528/repo-publication-audit@V0.4.1
     with:
       format: sarif
       output: repo-publication-audit.sarif
