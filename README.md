@@ -132,6 +132,13 @@ environments, dependency directories, and files larger than 1 MiB.
 Read [CONTRIBUTING.md](CONTRIBUTING.md). Security reports belong in the private
 channel described in [SECURITY.md](SECURITY.md).
 
+## Adoption and feedback
+
+Using the action or CLI in a public repository? Share what worked, what did
+not, and—only if you consent—your public repository URL through the
+[adoption issue template](https://github.com/duy90utc528/repo-publication-audit/issues/new?template=adopter.yml).
+This feedback determines the v0.4 roadmap.
+
 ## Roadmap
 
 - v0.3: SARIF output for GitHub Code Scanning and stable rule IDs.

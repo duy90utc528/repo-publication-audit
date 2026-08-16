@@ -1,0 +1,23 @@
+name: Share an adoption
+description: Tell us about a real repository using Repo Publication Audit.
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for using the project. Do not include credentials or private repository URLs.
+  - type: input
+    id: repository
+    attributes:
+      label: Public repository URL
+      description: Leave this blank if you do not want the project listed publicly.
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Permission
+      options:
+        - label: I allow this public repository to be listed as an adopter.
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What worked or did not work?
+    validations:
+      required: true
