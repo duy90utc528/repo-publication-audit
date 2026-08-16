@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## 0.3.1 — 2026-08-16
+
+- Fixed composite-action YAML parsing for CI inputs.
+
 ## 0.3.0 — 2026-08-16
 
 - Added SARIF 2.1.0 reports with stable rule IDs for GitHub Code Scanning.

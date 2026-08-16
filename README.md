@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: duy90utc528/repo-publication-audit@v0.3.0
+      - uses: duy90utc528/repo-publication-audit@v0.3.1
         with:
           fail-on: high
           respect-gitignore: true
@@ -75,7 +75,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: duy90utc528/repo-publication-audit@v0.3.0
+  - uses: duy90utc528/repo-publication-audit@v0.3.1
     with:
       format: sarif
       output: repo-publication-audit.sarif

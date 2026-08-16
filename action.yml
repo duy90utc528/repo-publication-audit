@@ -9,7 +9,7 @@ inputs:
     required: false
     default: .
   fail-on:
-    description: Lowest severity that fails the workflow: high, medium, or never.
+    description: "Lowest severity that fails the workflow: high, medium, or never."
     required: false
     default: high
   respect-gitignore:
@@ -17,7 +17,7 @@ inputs:
     required: false
     default: 'true'
   format:
-    description: Report format: text, json, or sarif.
+    description: "Report format: text, json, or sarif."
     required: false
     default: json
   output:
